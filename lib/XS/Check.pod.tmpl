@@ -1,0 +1,36 @@
+[% start_year=2017 %]
+[% MACRO example(file) BLOCK %]
+[%- pl =  file _ ".pl" -%]
+[%- out = file _ "-out.txt" -%]
+[% INCLUDE $pl | xtidy %]
+
+produces output
+
+[% INCLUDE $out | xtidy %]
+
+(This example is included as L<F<[% pl %]>|https://api.metacpan.org/source/BKB/XS-Check-[% info.version %]/examples/[% pl %]> in the distribution.)
+[% END %]
+[% MACRO since(version) BLOCK -%]
+This method was added in version [% version %] of the module.
+[%- END %]
+=encoding UTF-8
+
+=head1 NAME
+
+XS::Check - abstract here.
+
+=head1 SYNOPSIS
+
+    use XS::Check;
+
+=head1 VERSION
+
+This documents version [% info.version %] of XS::Check corresponding to
+L<git commit [% commit.commit %]|[% info.repo %]/commit/[%
+commit.commit %]> released on [% commit.date %].
+
+=head1 DESCRIPTION
+
+=head1 FUNCTIONS
+
+[% INCLUDE "author" %]
