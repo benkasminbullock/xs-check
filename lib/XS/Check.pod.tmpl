@@ -17,11 +17,13 @@ This method was added in version [% version %] of the module.
 
 =head1 NAME
 
-XS::Check - abstract here.
+XS::Check - check XS for problems
 
 =head1 SYNOPSIS
 
     use XS::Check;
+    my $check = XS::Check->new ();
+    $check->check_file ('some.xs');
 
 =head1 VERSION
 
@@ -31,6 +33,24 @@ commit.commit %]> released on [% commit.date %].
 
 =head1 DESCRIPTION
 
-=head1 FUNCTIONS
+=head1 METHODS
+
+=head2 check
+
+=head2 new
+
+=head2 check_file
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<File::Slurper>
+
+=item L<Text::LineNumbers>
+
+=item L<Carp>
+
+=back
 
 [% INCLUDE "author" %]
