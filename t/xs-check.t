@@ -4,6 +4,32 @@ use warnings;
 use strict;
 use Test::More;
 use_ok ('XS::Check');
+use XS::Check;
+my $warning;
+$SIG{__WARN__} = sub {
+$warning = shift;
+};
+my $checker = XS::Check->new ();
+$checker->check (<<EOF);
+const char * x;
+STRLEN len;
+x = SvPV (sv, len);
+EOF
+ok (! $warning, "No warning with OK code");
+$warning = undef;
+$checker->check (<<EOF);
+const char * x;
+unsigned int len;
+x = SvPV (sv, len);
+EOF
+ok ($warning, "Warning with not STRLEN");
+$warning = undef;
+$checker->check (<<EOF);
+char * x;
+STRLEN len;
+x = SvPV (sv, len);
+EOF
+ok ($warning, "Warning with not const char *");
 
 done_testing ();
 # Local variables:

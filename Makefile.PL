@@ -13,6 +13,8 @@ WriteMakefile (
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
     LICENSE => 'perl',
     PREREQ_PM => {
+	'Text::LineNumber' => '0.02',
+	'C::Tokenize' => '0.13',
     },
     META_MERGE => {
 	'meta-spec' => {
