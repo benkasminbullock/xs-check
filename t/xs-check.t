@@ -30,6 +30,12 @@ STRLEN len;
 x = SvPV (sv, len);
 EOF
 ok ($warning, "Warning with not const char *");
+$warning = undef;
+$checker->check (<<EOF);
+const char * x;
+x = malloc (100);
+EOF
+ok ($warning, "Warning with malloc");
 
 done_testing ();
 # Local variables:

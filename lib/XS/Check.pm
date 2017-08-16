@@ -20,6 +20,16 @@ sub new
     return bless {};
 }
 
+# Report an error $message in $var
+
+sub report
+{
+    my ($o, $var, $message) = @_;
+    my $file = $o->get_file ();
+    my $line = $o->get_line_number ($var);
+    warn "$file$line: $message";
+}
+
 # Match a call to SvPV
 
 my $svpv_re = qr/
@@ -38,7 +48,6 @@ my $svpv_re = qr/
 sub check_svpv
 {
     my ($o, $xs) = @_;
-    my $file = $o->get_file ();
     while ($xs =~ /($svpv_re)/g) {
 	my $match = $1;
 	my $lvar = $2;
@@ -46,14 +55,22 @@ sub check_svpv
 	my $lvar_type = $o->get_type ($lvar);
 	my $arg2_type = $o->get_type ($arg2);
 	if ($lvar_type && $lvar_type !~ /const\s+char\s+\*/) {
-	    my $lineno = $o->get_line_number ($xs);
-	    warn "$file$lineno: $lvar not const char *";
+	    $o->report ($xs, "$lvar not const char *");
 	}
 	if ($arg2_type && $arg2_type !~ /STRLEN/) {
-	    my $lineno = $o->get_line_number ($xs);
-	    warn "$file$lineno: $arg2 not STRLEN, type = $arg2_type";
+	    $o->report ($xs, "$lvar not const char *");
 	}
     }
+}
+
+# Look for malloc/calloc/realloc/free and suggest replacing them.
+
+sub check_malloc
+{
+my ($o, $xs) = @_;
+while ($xs =~ /((?:m|c|re)alloc|free)/g) {
+$o->report ("Change $1 to Newx/Newz/Safefree");
+}
 }
 
 # Regular expression to match a C declaration.
@@ -138,6 +155,7 @@ sub check
     $o->line_numbers ($xs);
     $o->read_declarations ($xs);
     $o->check_svpv ($xs);
+    $o->check_malloc ($xs);
 }
 
 sub check_file

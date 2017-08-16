@@ -33,23 +33,73 @@ commit.commit %]> released on [% commit.date %].
 
 =head1 DESCRIPTION
 
-=head1 METHODS
+Check XS files for errors.
 
-=head2 check
+=head1 METHODS
 
 =head2 new
 
+    my $check = XS::Check->new ();
+
+=head2 check
+
+    $check->check ($xs);
+
+See L</SUGGESTIONS> for what this reports.
+
 =head2 check_file
+
+    $check->check ($xs_file);
+
+Convenience method to read in $xs_file then run L</check> on it.
+
+This assumes UTF-8 encoding of $xs_file.
+
+=head1 SUGGESTIONS
+
+This section details the possible suggestions made by the module and
+the motivations behind them.
+
+=head2 Use STRLEN in SvPV
+
+Using an int type for the second argument to SvPV may cause errors on
+64-bit Perls.
+
+=head2 Use const char * for return value of SvPV
+
+Be careful to not overwrite Perl's own buffer, which SvPV returns.
+
+=head2 Don't use malloc/calloc/realloc/free
+
+Replace with Newx etc. 
+
+These cause "free to wrong pool" errors on multithreaded Windows
+Perls.
 
 =head1 DEPENDENCIES
 
 =over
 
-=item L<File::Slurper>
+=item L<File::Slurper/read_text>
 
-=item L<Text::LineNumbers>
+This is used by L</check_file>.
+
+=item L<Text::LineNumber>
+
+This is used to get the line numbers.
 
 =item L<Carp>
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Perl XS modules and CPAN testers|https://www.lemoda.net/perl/perl-xs-cpan-testers/index.html>
+
+A collection of more or less obscure bugs found by CPAN testers, the
+original inspiration for this module.
 
 =back
 
