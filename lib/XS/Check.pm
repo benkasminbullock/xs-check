@@ -13,6 +13,7 @@ our $VERSION = '0.01';
 use C::Tokenize ':all';
 use Text::LineNumber;
 use File::Slurper 'read_text';
+use Carp qw/croak carp cluck confess/;
 
 sub new
 {
@@ -20,13 +21,25 @@ sub new
     return bless {};
 }
 
+sub get_line_number
+{
+    my ($o) = @_;
+    my $pos = pos ($o->{xs});
+    if (! defined ($pos)) {
+	confess "Bad pos for XS text";
+	return "unknown";
+    }
+    return $o->{tln}->off2lnr ($pos);
+}
+
 # Report an error $message in $var
 
 sub report
 {
-    my ($o, $var, $message) = @_;
+    my ($o, $message) = @_;
     my $file = $o->get_file ();
-    my $line = $o->get_line_number ($var);
+    my $line = $o->get_line_number ();
+    confess "No message" unless $message;
     warn "$file$line: $message";
 }
 
@@ -34,7 +47,7 @@ sub report
 
 my $svpv_re = qr/
 		    ($word_re)
-		    \s*=\s*
+		    \s*=[^;]*
 		    SvPV
 		    \s*\(\s*
 		    ($word_re)
@@ -47,18 +60,19 @@ my $svpv_re = qr/
 
 sub check_svpv
 {
-    my ($o, $xs) = @_;
-    while ($xs =~ /($svpv_re)/g) {
+    my ($o) = @_;
+    while ($o->{xs} =~ /($svpv_re)/g) {
 	my $match = $1;
 	my $lvar = $2;
 	my $arg2 = $4;
 	my $lvar_type = $o->get_type ($lvar);
 	my $arg2_type = $o->get_type ($arg2);
-	if ($lvar_type && $lvar_type !~ /const\s+char\s+\*/) {
-	    $o->report ($xs, "$lvar not const char *");
+	#print "<$match> $lvar_type $arg2_type\n";
+	if ($lvar_type && $lvar_type !~ /\bconst\b/) {
+	    $o->report ("$lvar not a constant type");
 	}
-	if ($arg2_type && $arg2_type !~ /STRLEN/) {
-	    $o->report ($xs, "$lvar not const char *");
+	if ($arg2_type && $arg2_type !~ /\bSTRLEN\b/) {
+	    $o->report ("$lvar is not a STRLEN variable");
 	}
     }
 }
@@ -67,10 +81,10 @@ sub check_svpv
 
 sub check_malloc
 {
-my ($o, $xs) = @_;
-while ($xs =~ /((?:m|c|re)alloc|free)/g) {
-$o->report ("Change $1 to Newx/Newz/Safefree");
-}
+    my ($o) = @_;
+    while ($o->{xs} =~ /\b((?:m|c|re)alloc|free)\b/g) {
+	$o->report ("Change $1 to Newx/Newz/Safefree");
+    }
 }
 
 # Regular expression to match a C declaration.
@@ -96,8 +110,8 @@ my $declare_re = qr/
 
 sub read_declarations
 {
-    my ($o, $xs) = @_;
-    while ($xs =~ /$declare_re/g) {
+    my ($o) = @_;
+    while ($o->{xs} =~ /$declare_re/g) {
 	my $type = $2;
 	my $var = $3;
 	#print "type = $type for $var\n";
@@ -122,20 +136,9 @@ sub get_type
 
 sub line_numbers
 {
-    my ($o, $xs) = @_;
-    my $tln = Text::LineNumber->new ($xs);
+    my ($o) = @_;
+    my $tln = Text::LineNumber->new ($o->{xs});
     $o->{tln} = $tln;
-}
-
-sub get_line_number
-{
-    my ($o, $xs) = @_;
-    my $pos = pos ($xs);
-    if (! defined ($pos)) {
-	warn "Bad pos for XS text";
-	return "unknown";
-    }
-    return $o->{tln}->off2lnr ($pos);
 }
 
 sub get_file
@@ -147,22 +150,34 @@ sub get_file
     return "$o->{file}:";
 }
 
+# Clear up old variables
+
+sub cleanup
+{
+    my ($o) = @_;
+    delete $o->{vars};
+}
+
 # Check the XS.
 
 sub check
 {
     my ($o, $xs) = @_;
-    $o->line_numbers ($xs);
-    $o->read_declarations ($xs);
-    $o->check_svpv ($xs);
-    $o->check_malloc ($xs);
+    $o->{xs} = $xs;
+    $o->line_numbers ();
+    $o->read_declarations ();
+    $o->check_svpv ();
+    $o->check_malloc ();
+    $o->{xs} = undef;
+    $o->cleanup ();
 }
 
 sub check_file
 {
     my ($o, $file) = @_;
     $o->{file} = $file;
-    my $xs = read_file ($file);
+    my $xs = read_text ($file);
+    #print "$xs\n";
     check ($o, $xs);
     $o->{file} = undef;
 }
