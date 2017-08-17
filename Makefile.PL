@@ -15,6 +15,7 @@ WriteMakefile (
     PREREQ_PM => {
 	'Text::LineNumber' => '0.02',
 	'C::Tokenize' => '0.13',
+	'File::Slurper' => '0.009',
     },
     META_MERGE => {
 	'meta-spec' => {
