@@ -9,7 +9,7 @@ require Exporter;
 # our %EXPORT_TAGS = (
 #     all => \@EXPORT_OK,
 # );
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use C::Tokenize ':all';
 use Text::LineNumber;
 use File::Slurper 'read_text';
