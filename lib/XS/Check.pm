@@ -34,7 +34,7 @@ sub report
     my $file = $o->get_file ();
     my $line = $o->get_line_number ();
     confess "No message" unless $message;
-    warn "$file$line: $message";
+    warn "$file$line: $message.\n";
 }
 
 # Match a call to SvPV
