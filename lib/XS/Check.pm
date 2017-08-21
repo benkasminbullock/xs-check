@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use Carp;
 use utf8;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use C::Tokenize ':all';
 use Text::LineNumber;
 use File::Slurper 'read_text';
@@ -40,7 +40,7 @@ sub report
 # Match a call to SvPV
 
 my $svpv_re = qr/
-		    ($word_re)
+		    ((?:$word_re(?:->|\.))*$word_re)
 		    \s*=[^;]*
 		    SvPV
 		    \s*\(\s*
@@ -97,6 +97,7 @@ my $declare_re = qr/
 			       $word_re
 			   )
 		       )
+		       # Match initial value.
 		       \s*(?:=[^;]+)?;
 		   /x;
 
@@ -121,9 +122,15 @@ sub read_declarations
 sub get_type
 {
     my ($o, $var) = @_;
+    # We currently do not have a way to store and retrieve types of
+    # structure members
+    if ($var =~ /->|\./) {
+	$o->report ("Cannot get type of $var, please check manually");
+	return undef;
+    }
     my $type = $o->{vars}{$var};
     if (! $type) {
-	warn "No type for $var";
+	$o->report ("(BUG) No type for $var");
     }
     return $type;
 }
@@ -152,12 +159,30 @@ sub cleanup
     delete $o->{vars};
 }
 
+sub strip_comments
+{
+    my ($o) = @_;
+    my $xs = $o->{xs};
+    while ($xs =~ /($trad_comment_re)/) {
+	my $comment = $1;
+	my $subs = '';
+	while ($comment =~ /([\n\r])/g) {
+	    $subs .= $1;
+	}
+	$xs =~ s/\Q$comment\E/$subs/;
+    }
+    # Remove // comments completely.
+    $xs =~ s/$cxx_comment_re/\n/g;
+    $o->{xs} = $xs;
+}
+
 # Check the XS.
 
 sub check
 {
     my ($o, $xs) = @_;
     $o->{xs} = $xs;
+    $o->strip_comments ();
     $o->line_numbers ();
     $o->read_declarations ();
     $o->check_svpv ();
