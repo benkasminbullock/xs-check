@@ -1,5 +1,9 @@
 Revision history for Perl module XS::Check
 
+0.04 2017-08-22
+
+- Remove author tests
+
 0.03 2017-08-22
 
 - C comments are now ignored

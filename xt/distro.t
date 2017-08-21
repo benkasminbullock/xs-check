@@ -31,7 +31,7 @@ my @tgz = `tar tfz $distrofile`;
 my %badfiles;
 my %files;
 for (@tgz) {
-    if (/(\.tmpl|-out\.txt|(?:make-pod|build)\.pl)$/) {
+    if (/(\.tmpl|-out\.txt|(?:make-pod|build)\.pl|\/xt\/)$/) {
 	$files{$1} = 1;
 	$badfiles{$1} = 1;
     }
