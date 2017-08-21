@@ -47,6 +47,12 @@ CODE:
 EOF
 ok (! $warning, "No warning with 'free' embedded in another string");
 
+$warning = undef;
+$checker->check (<<EOF);
+/* realloc malloc free free (x) */
+EOF
+ok (! $warning, "No warning with 'realloc' in a comment");
+
 TODO: {
 local $TODO='read function arguments';
 $warning = undef;
