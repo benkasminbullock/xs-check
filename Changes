@@ -1,5 +1,10 @@
 Revision history for Perl module XS::Check
 
+0.03 2017-08-22
+
+- C comments are now ignored
+- Better check of types of variables
+
 0.02 2017-08-17
 
 - Dependencies corrected
