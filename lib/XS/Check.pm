@@ -81,6 +81,16 @@ sub check_malloc
     }
 }
 
+# Look for a Perl_ prefix before functions.
+
+sub check_perl_prefix
+{
+    my ($o) = @_;
+    while ($o->{xs} =~ /\b(Perl_$word_re)\b/g) {
+	$o->report ("Remove the 'Perl_' prefix from $1");
+    }
+}
+
 # Regular expression to match a C declaration.
 
 my $declare_re = qr/
@@ -187,6 +197,7 @@ sub check
     $o->read_declarations ();
     $o->check_svpv ();
     $o->check_malloc ();
+    $o->check_perl_prefix ();
     $o->{xs} = undef;
     $o->cleanup ();
 }

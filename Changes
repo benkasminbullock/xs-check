@@ -3,6 +3,7 @@ Revision history for Perl module XS::Check
 0.05 2017-08-22
 
 - Correct variable names
+- Add a check for the "Perl_" prefix
 
 0.04 2017-08-22
 

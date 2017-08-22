@@ -53,6 +53,12 @@ $checker->check (<<EOF);
 EOF
 ok (! $warning, "No warning with 'realloc' in a comment");
 
+$warning = undef;
+$checker->check (<<'EOF');
+Perl_croak ("croaking");
+EOF
+ok ($warning, "Got a warning with Perl_croak");
+
 TODO: {
 local $TODO='read function arguments';
 $warning = undef;
@@ -66,6 +72,8 @@ sv_to_text_fuzzy (SV * text, STRLEN length)
 EOF
 ok (! $warning, "No warning with variable from function argument");
 };
+
+
 
 done_testing ();
 # Local variables:
