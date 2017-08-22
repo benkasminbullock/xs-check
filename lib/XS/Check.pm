@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use Carp;
 use utf8;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use C::Tokenize ':all';
 use Text::LineNumber;
 use File::Slurper 'read_text';
@@ -66,7 +66,7 @@ sub check_svpv
 	    $o->report ("$lvar not a constant type");
 	}
 	if ($arg2_type && $arg2_type !~ /\bSTRLEN\b/) {
-	    $o->report ("$lvar is not a STRLEN variable");
+	    $o->report ("$arg2 is not a STRLEN variable ($arg2_type)");
 	}
     }
 }

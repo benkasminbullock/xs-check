@@ -1,5 +1,9 @@
 Revision history for Perl module XS::Check
 
+0.05 2017-08-22
+
+- Correct variable names
+
 0.04 2017-08-22
 
 - Remove author tests
