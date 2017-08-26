@@ -1,5 +1,9 @@
 Revision history for Perl module XS::Check
 
+0.06 2017-08-26
+
+- Check for (void) arguments
+
 0.05 2017-08-22
 
 - Correct variable names
