@@ -192,9 +192,9 @@ my $void_re = qr/
 		    (?=
 			# CODE:, PREINIT:, etc.
 			[A-Z]+:
-		    |
+#		    |
 			# Normal C function start
-			\{
+#			\{
 		    )
 /xsm;
 

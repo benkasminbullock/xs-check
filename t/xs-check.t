@@ -72,6 +72,15 @@ OUTPUT:
 EOF
 ok ($warning, "Got a warning with void argument to function");
 like ($warning, qr/4:/, "Got correct line number for error");
+$warning = undef;
+$checker->check (<<'EOF');
+MODULE=poo
+
+int
+test_arglist(void)
+{
+EOF
+ok (! $warning, "Got no warning with void argument to C function");
 
 TODO: {
 local $TODO='read function arguments';
