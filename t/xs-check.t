@@ -59,6 +59,20 @@ Perl_croak ("croaking");
 EOF
 ok ($warning, "Got a warning with Perl_croak");
 
+$warning = undef;
+$checker->check (<<'EOF');
+MODULE=poo
+
+int
+test_arglist(void)
+CODE:
+    RETVAL = 1;
+OUTPUT:
+    RETVAL
+EOF
+ok ($warning, "Got a warning with void argument to function");
+like ($warning, qr/4:/, "Got correct line number for error");
+
 TODO: {
 local $TODO='read function arguments';
 $warning = undef;

@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use Carp;
 use utf8;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use C::Tokenize ':all';
 use Text::LineNumber;
 use File::Slurper 'read_text';
@@ -186,6 +186,26 @@ sub strip_comments
     $o->{xs} = $xs;
 }
 
+my $void_re = qr/
+		    $word_re\s*
+		    \(\s*void\s*\)\s*
+		    (?=
+			# CODE:, PREINIT:, etc.
+			[A-Z]+:
+		    |
+			# Normal C function start
+			\{
+		    )
+/xsm;
+
+sub check_void_arg
+{
+    my ($o) = @_;
+    while ($o->{xs} =~ /$void_re/g) {
+	$o->report ("Don't use (void) in function arguments");
+    }
+}
+
 # Check the XS.
 
 sub check
@@ -198,6 +218,7 @@ sub check
     $o->check_svpv ();
     $o->check_malloc ();
     $o->check_perl_prefix ();
+    $o->check_void_arg ();
     $o->{xs} = undef;
     $o->cleanup ();
 }
