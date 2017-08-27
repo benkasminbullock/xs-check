@@ -82,6 +82,30 @@ test_arglist(void)
 EOF
 ok (! $warning, "Got no warning with void argument to C function");
 
+my %rstuff;
+
+sub reporter
+{
+    %rstuff = @_;
+}
+
+my $rchecker = XS::Check->new (reporter => \& reporter);
+ok ($rchecker->{reporter}, "Field added OK");
+$warning = undef;
+$rchecker->check (<<'EOF');
+Perl_croak ("croaking");
+EOF
+ok (! defined ($warning), "did not issue a warning");
+ok ($rstuff{message}, "got a message");
+ok ($rstuff{line} == 1, "got a line number");
+ok (! $rstuff{file}, "No file name for inline thing");
+%rstuff = ();
+
+$warning = undef;
+my $badchecker = XS::Check->new (reporter => 'doughnuts');
+ok ($warning, "warning from bad reporter value");
+like ($warning, qr/code reference/, "correct warning");
+
 TODO: {
 local $TODO='read function arguments';
 $warning = undef;

@@ -12,7 +12,16 @@ use Carp qw/croak carp cluck confess/;
 sub new
 {
     my ($class, %options) = @_;
-    return bless {};
+    my $o = bless {};
+    if (my $r = $options{reporter}) {
+	if (ref $r ne 'CODE') {
+	    carp "reporter should be a code reference";
+	}
+	else {
+	    $o->{reporter} = $r;
+	}
+    }
+    return $o;
 }
 
 sub get_line_number
@@ -34,7 +43,12 @@ sub report
     my $file = $o->get_file ();
     my $line = $o->get_line_number ();
     confess "No message" unless $message;
-    warn "$file$line: $message.\n";
+    if (my $r = $o->{reporter}) {
+	&$r (file => $file, line => $line, message => $message);
+    }
+    else {
+	warn "$file$line: $message.\n";
+    }
 }
 
 # Match a call to SvPV
