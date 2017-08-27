@@ -1,5 +1,10 @@
 Revision history for Perl module XS::Check
 
+0.07 2017-08-28
+
+- Don't reject valid C (void) arguments
+- Callback for reporting errors
+
 0.06 2017-08-26
 
 - Check for (void) arguments
