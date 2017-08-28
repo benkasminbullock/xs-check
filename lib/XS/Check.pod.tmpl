@@ -154,6 +154,12 @@ the following doesn't get dealt with properly:
 L</check_file> uses L<File::Slurper/read_text> to read the text, which
 means it only takes UTF-8.
 
+=item Variable declarations rely on a simplistic hack
+
+The current method of parsing variable declarations uses a very
+simplistic hack, and it is likely to produce false results if a
+variable name is used twice for two different things in the same file.
+
 =back
 
 =head1 DEPENDENCIES

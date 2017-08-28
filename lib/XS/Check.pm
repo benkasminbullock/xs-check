@@ -9,20 +9,12 @@ use Text::LineNumber;
 use File::Slurper 'read_text';
 use Carp qw/croak carp cluck confess/;
 
-sub new
-{
-    my ($class, %options) = @_;
-    my $o = bless {};
-    if (my $r = $options{reporter}) {
-	if (ref $r ne 'CODE') {
-	    carp "reporter should be a code reference";
-	}
-	else {
-	    $o->{reporter} = $r;
-	}
-    }
-    return $o;
-}
+#  ____       _            _       
+# |  _ \ _ __(_)_   ____ _| |_ ___ 
+# | |_) | '__| \ \ / / _` | __/ _ \
+# |  __/| |  | |\ V / (_| | ||  __/
+# |_|   |_|  |_| \_/ \__,_|\__\___|
+#                                 
 
 sub get_line_number
 {
@@ -85,7 +77,10 @@ sub check_svpv
     }
 }
 
+# Best equivalents.
+
 my %equiv = (
+    #  Newxc is for C++ programmers (cast malloc).
     malloc => 'Newx/Newxc',
     calloc => 'Newxz',
     free => 'Safefree',
@@ -150,6 +145,10 @@ sub read_declarations
 	my $var = $3;
 	#print "type = $type for $var\n";
 	if ($o->{vars}{$type}) {
+	    # This is very likely to produce false positives in a long
+	    # file. A better way to do this would be to have variables
+	    # associated with line numbers, so that x on line 10 is
+	    # different from x on line 20.
 	    warn "duplicate variable $var of type $type\n";
 	}
 	$o->{vars}{$var} = $type;
@@ -174,12 +173,17 @@ sub get_type
     return $type;
 }
 
+# Set up the line numbering object.
+
 sub line_numbers
 {
     my ($o) = @_;
     my $tln = Text::LineNumber->new ($o->{xs});
     $o->{tln} = $tln;
 }
+
+# This adds a colon to the end of the file, so it shouldn't really be
+# user-visible.
 
 sub get_file
 {
@@ -190,16 +194,9 @@ sub get_file
     return "$o->{file}:";
 }
 
-sub set_file
-{
-    my ($o, $file) = @_;
-    if (! $file) {
-	$file = undef;
-    }
-    $o->{file} = $file;
-}
-
-# Clear up old variables, inputs, etc.
+# Clear up old variables, inputs, etc. Don't delete everything since
+# we want to keep at least the field "reporter" from one call to
+# "check" to the next.
 
 sub cleanup
 {
@@ -208,6 +205,8 @@ sub cleanup
 	delete $o->{$_};
     }
 }
+
+# Regex to match (void) in XS function call.
 
 my $void_re = qr/
 		    $word_re\s*
@@ -221,12 +220,45 @@ my $void_re = qr/
 		    )
 /xsm;
 
+# Look for (void) XS functions
+
 sub check_void_arg
 {
     my ($o) = @_;
     while ($o->{xs} =~ /$void_re/g) {
 	$o->report ("Don't use (void) in function arguments");
     }
+}
+
+#  _   _                       _     _ _     _      
+# | | | |___  ___ _ __  __   _(_)___(_) |__ | | ___ 
+# | | | / __|/ _ \ '__| \ \ / / / __| | '_ \| |/ _ \
+# | |_| \__ \  __/ |     \ V /| \__ \ | |_) | |  __/
+#  \___/|___/\___|_|      \_/ |_|___/_|_.__/|_|\___|
+#                                                  
+
+sub new
+{
+    my ($class, %options) = @_;
+    my $o = bless {};
+    if (my $r = $options{reporter}) {
+	if (ref $r ne 'CODE') {
+	    carp "reporter should be a code reference";
+	}
+	else {
+	    $o->{reporter} = $r;
+	}
+    }
+    return $o;
+}
+
+sub set_file
+{
+    my ($o, $file) = @_;
+    if (! $file) {
+	$file = undef;
+    }
+    $o->{file} = $file;
 }
 
 # Check the XS.
