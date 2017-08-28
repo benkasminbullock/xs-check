@@ -3,8 +3,8 @@ use warnings;
 use strict;
 use Carp;
 use utf8;
-our $VERSION = '0.07';
-use C::Tokenize ':all';
+our $VERSION = '0.08';
+use C::Tokenize '0.14', ':all';
 use Text::LineNumber;
 use File::Slurper 'read_text';
 use Carp qw/croak carp cluck confess/;
@@ -85,13 +85,28 @@ sub check_svpv
     }
 }
 
+my %equiv = (
+    malloc => 'Newx/Newxc',
+    calloc => 'Newxz',
+    free => 'Safefree',
+    realloc => 'Renew',
+);
+
 # Look for malloc/calloc/realloc/free and suggest replacing them.
 
 sub check_malloc
 {
     my ($o) = @_;
     while ($o->{xs} =~ /\b((?:m|c|re)alloc|free)\b/g) {
-	$o->report ("Change $1 to Newx/Newz/Safefree");
+	# Bad function
+	my $badfun = $1;
+	my $equiv = $equiv{$badfun};
+	if (! $equiv) {
+	    $o->report ("(BUG) No equiv for $badfun");
+	}
+	else {
+	    $o->report ("Change $badfun to $equiv");
+	}
     }
 }
 
@@ -175,29 +190,23 @@ sub get_file
     return "$o->{file}:";
 }
 
-# Clear up old variables
+sub set_file
+{
+    my ($o, $file) = @_;
+    if (! $file) {
+	$file = undef;
+    }
+    $o->{file} = $file;
+}
+
+# Clear up old variables, inputs, etc.
 
 sub cleanup
 {
     my ($o) = @_;
-    delete $o->{vars};
-}
-
-sub strip_comments
-{
-    my ($o) = @_;
-    my $xs = $o->{xs};
-    while ($xs =~ /($trad_comment_re)/) {
-	my $comment = $1;
-	my $subs = '';
-	while ($comment =~ /([\n\r])/g) {
-	    $subs .= $1;
-	}
-	$xs =~ s/\Q$comment\E/$subs/;
+    for (qw/vars xs file/) {
+	delete $o->{$_};
     }
-    # Remove // comments completely.
-    $xs =~ s/$cxx_comment_re/\n/g;
-    $o->{xs} = $xs;
 }
 
 my $void_re = qr/
@@ -226,25 +235,23 @@ sub check
 {
     my ($o, $xs) = @_;
     $o->{xs} = $xs;
-    $o->strip_comments ();
+    $o->{xs} = strip_comments ($o->{xs});
     $o->line_numbers ();
     $o->read_declarations ();
     $o->check_svpv ();
     $o->check_malloc ();
     $o->check_perl_prefix ();
     $o->check_void_arg ();
-    $o->{xs} = undef;
+    # Final line
     $o->cleanup ();
 }
 
 sub check_file
 {
     my ($o, $file) = @_;
-    $o->{file} = $file;
+    $o->set_file ($file);
     my $xs = read_text ($file);
-    #print "$xs\n";
-    check ($o, $xs);
-    $o->{file} = undef;
+    $o->check ($xs);
 }
 
 1;

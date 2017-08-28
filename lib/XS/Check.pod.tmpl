@@ -41,6 +41,8 @@ This module offers ways to check XS files for common flaws.
 
 Make a new XS::Check object.
 
+=head3 Changing where the messages go
+
 For user-defined error reporting, supply a code reference with the key
 C<reporter> as follows:
 
@@ -54,7 +56,8 @@ fields
 =item file
 
 the file name of the file where the error occurred, if using
-L</check_file>, otherwise the undefined value (C<undef>),
+L</check_file> or if set with L</set_file>, otherwise the undefined
+value (C<undef>),
 
 =item line
 
@@ -71,7 +74,7 @@ C<message> and C<line> fields:
 
 [% example("reporter") %]
 
-Callback error reporting was added to the module in version 0.06.
+Callback error reporting was added to the module in version 0.07.
 
 =head2 check
 
@@ -86,6 +89,17 @@ See L</SUGGESTIONS> for what this reports.
 Convenience method to read in $xs_file then run L</check> on it.
 
 This assumes UTF-8 encoding of $xs_file.
+
+=head2 set_file
+
+    $check->set_file ($file);
+
+Set the file name for error reporting. Use any false value to clear
+it. For example:
+
+[% example("set-file") %]
+
+This method was added in version 0.08.
 
 =head1 SUGGESTIONS
 
