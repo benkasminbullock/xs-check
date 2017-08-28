@@ -14,7 +14,7 @@ WriteMakefile (
     LICENSE => 'perl',
     PREREQ_PM => {
 	'Text::LineNumber' => '0.02',
-	'C::Tokenize' => '0.13',
+	'C::Tokenize' => '0.14',
 	'File::Slurper' => '0.009',
 	'Carp' => '0',
     },
