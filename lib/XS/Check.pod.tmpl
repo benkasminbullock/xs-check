@@ -39,16 +39,19 @@ This module offers ways to check XS files for common flaws.
 
     my $check = XS::Check->new ();
 
-Make a new XS::Check object.
+Make a new XS::Check object. The checks are then run using L</check>
+or L</check_file>.
 
 =head3 Changing where the messages go
 
-For user-defined error reporting, supply a code reference with the key
-C<reporter> as follows:
+The messages from L</check> or L</check_file> are usually printed
+using Perl's built-in warn function. If you need to have errors
+reported some other way, supply a code reference to C<new> with the
+key C<reporter> as follows:
 
     my $usercheck = XS::Check->new (reporter => sub { print "help!" });
 
-The arguments to the user defined function are a hash containing the
+The function you supply is then called back when L</check> or L</check_file> find something to remark on. The function is called with a hash containing the
 fields
 
 =over
@@ -113,7 +116,8 @@ Using an int type for the second argument to SvPV may cause errors on
 
 =head2 Use const char * for return value of SvPV
 
-Be careful to not overwrite Perl's own buffer, which SvPV returns.
+SvPV returns the actual Perl buffer, not a copy, so it's better to use
+const char * to make sure one does not overwrite it.
 
 =head2 Don't use malloc/calloc/realloc/free
 
@@ -159,6 +163,17 @@ means it only takes UTF-8.
 The current method of parsing variable declarations uses a very
 simplistic hack, and it is likely to produce false results if a
 variable name is used twice for two different things in the same file.
+
+=item Variables declared within function definitions are not parsed
+
+The following variable C<length> is not dealt with correctly:
+
+    static void
+    sv_to_text_fuzzy (SV * text, STRLEN length)
+    {
+        const unsigned char * stuff;
+        /* Copy the string in "text" into "text_fuzzy". */
+        stuff = (unsigned char *) SvPV (text, length);
 
 =back
 
