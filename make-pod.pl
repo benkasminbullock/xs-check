@@ -11,6 +11,9 @@ my $ok = GetOptions (
     'force' => \my $force,
     'verbose' => \my $verbose,
 );
+make_pod (verbose => $verbose, force => $force);
+
+
 if (! $ok) {
     usage ();
     exit;
