@@ -16,7 +16,6 @@ WriteMakefile (
 	'Text::LineNumber' => '0.02',
 	'C::Tokenize' => '0.14',
 	'File::Slurper' => '0.009',
-	'Carp' => '0',
     },
     META_MERGE => {
 	'meta-spec' => {
