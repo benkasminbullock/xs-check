@@ -67,7 +67,9 @@ sub check_svpv
 	my $arg2 = $4;
 	my $lvar_type = $o->get_type ($lvar);
 	my $arg2_type = $o->get_type ($arg2);
-	#print "<$match> $lvar_type $arg2_type\n";
+	if ($o->{verbose}) {
+	    debugmsg ("<$match> $lvar_type $arg2_type");
+	}
 	if ($lvar_type && $lvar_type !~ /\bconst\b/) {
 	    $o->report ("$lvar not a constant type");
 	}
@@ -143,7 +145,9 @@ sub read_declarations
     while ($o->{xs} =~ /$declare_re/g) {
 	my $type = $2;
 	my $var = $3;
-	#print "type = $type for $var\n";
+	if ($o->{verbose}) {
+	    debugmsg "type = $type for $var";
+	}
 	if ($o->{vars}{$type}) {
 	    # This is very likely to produce false positives in a long
 	    # file. A better way to do this would be to have variables
@@ -284,6 +288,13 @@ sub check_file
     $o->set_file ($file);
     my $xs = read_text ($file);
     $o->check ($xs);
+}
+
+sub debugmsg
+{
+    my (undef, $file, $line) = caller ();
+    printf ("%s:%d: ", $file, $line);
+    print "@_\n";
 }
 
 1;
