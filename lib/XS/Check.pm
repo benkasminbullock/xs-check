@@ -16,6 +16,13 @@ use Carp qw/croak carp cluck confess/;
 # |_|   |_|  |_| \_/ \__,_|\__\___|
 #                                 
 
+sub debugmsg
+{
+    my (undef, $file, $line) = caller ();
+    printf ("%s:%d: ", $file, $line);
+    print "@_\n";
+}
+
 sub get_line_number
 {
     my ($o) = @_;
@@ -89,12 +96,13 @@ my %equiv = (
     realloc => 'Renew',
 );
 
-# Look for malloc/calloc/realloc/free and suggest replacing them.
+# Look for calls to malloc/calloc/realloc/free and suggest replacing
+# them.
 
 sub check_malloc
 {
     my ($o) = @_;
-    while ($o->{xs} =~ /\b((?:m|c|re)alloc|free)\b/g) {
+    while ($o->{xs} =~ /\b((?:m|c|re)alloc|free)\s*\(/g) {
 	# Bad function
 	my $badfun = $1;
 	my $equiv = $equiv{$badfun};
@@ -146,7 +154,7 @@ sub read_declarations
 	my $type = $2;
 	my $var = $3;
 	if ($o->{verbose}) {
-	    debugmsg "type = $type for $var";
+	    debugmsg ("type = $type for $var");
 	}
 	if ($o->{vars}{$type}) {
 	    # This is very likely to produce false positives in a long
@@ -288,13 +296,6 @@ sub check_file
     $o->set_file ($file);
     my $xs = read_text ($file);
     $o->check ($xs);
-}
-
-sub debugmsg
-{
-    my (undef, $file, $line) = caller ();
-    printf ("%s:%d: ", $file, $line);
-    print "@_\n";
 }
 
 1;
