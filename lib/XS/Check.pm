@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use Carp;
 use utf8;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use C::Tokenize '0.14', ':all';
 use Text::LineNumber;
 use File::Slurper 'read_text';
@@ -242,6 +242,38 @@ sub check_void_arg
     }
 }
 
+sub
+check_hash_comments
+{
+    my ($o) = @_;
+    while ($o->{xs} =~ /^#\s*(\w*)/gsm) {
+	my $hash = $1;
+	if ($hash !~ /^(?:if|ifdef|else|endif|line|define|include|undef)(\s+|$)/) {
+	    $o->report ("Put whitespace before # in comments");
+	}
+    }
+}
+
+sub
+check_c_pre
+{
+    my ($o) = @_;
+    while ($o->{xs} =~ /^#\s*(\w*)/gsm) {
+	my $hash = $1;
+	if ($hash =~ /(?:if|else|endif)\s+/) {
+	    # Complicated!
+	}
+    }
+}
+
+sub check_fetch_deref
+{
+    my ($o) = @_;
+    while ($o->{xs} =~ m!(\*\s*(?:a|h)v_fetch)!g) {
+	$o->report ("Dereference of av/hv_fetch");
+    }
+}
+
 #  _   _                       _     _ _     _      
 # | | | |___  ___ _ __  __   _(_)___(_) |__ | | ___ 
 # | | | / __|/ _ \ '__| \ \ / / / __| | '_ \| |/ _ \
@@ -286,6 +318,9 @@ sub check
     $o->check_malloc ();
     $o->check_perl_prefix ();
     $o->check_void_arg ();
+    $o->check_c_pre ();
+    $o->check_hash_comments ();
+    $o->check_fetch_deref ();
     # Final line
     $o->cleanup ();
 }

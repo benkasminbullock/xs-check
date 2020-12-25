@@ -128,7 +128,10 @@ Perls.
 
 =head2 Don't use the Perl_ prefix
 
-Functions like C<Perl_croak> should not be used, just C<croak>.
+Functions like C<Perl_croak> should not be used, just C<croak>. The
+C<Perl_> prefix functions may take arguments which are hidden in the
+macros like C<croak>. These are the C<pTHX_> style things of the Perl
+source code.
 
 This check was added in version 0.04.
 
@@ -139,6 +142,21 @@ not take any arguments, instead this results in a variable called
 "void" being created.
 
 This check was added in version 0.06.
+
+=head2 Dereferencing av_fetch or hv_fetch
+
+One should not dereference the return value of av_fetch or hv_fetch
+without checking for nulls since it is possible to return C<NULL>, for
+example if an array is created with only a tenth element.
+
+This check was added in version 0.09.
+
+=head2 Put whitespace before hash comments
+
+The XS manual suggests putting whitespace before # comments to
+distinguish them from preprocessor statements.
+
+This check was added in version 0.09.
 
 =head1 LIMITATIONS
 

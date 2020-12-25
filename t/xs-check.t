@@ -7,7 +7,7 @@ use_ok ('XS::Check');
 use XS::Check;
 my $warning;
 $SIG{__WARN__} = sub {
-$warning = shift;
+    $warning = shift;
 };
 my $checker = XS::Check->new ();
 $checker->check (<<EOF);

@@ -1,5 +1,10 @@
 Revision history for Perl module XS::Check
 
+0.09 2020-12-25
+
+- Insist on whitespace before # comments
+- Warn about dereferencing of av_fetch and hv_fetch
+
 0.08 2017-08-28
 
 - Internal changes (strip_comments moved to C::Tokenize)
