@@ -3,17 +3,17 @@ use warnings;
 use strict;
 use Template;
 use FindBin '$Bin';
+use Getopt::Long;
+
 use Perl::Build qw/get_info get_commit/;
 use Perl::Build::Pod ':all';
 use Deploy qw/do_system older/;
-use Getopt::Long;
+
 my $ok = GetOptions (
     'force' => \my $force,
     'verbose' => \my $verbose,
 );
 make_pod (verbose => $verbose, force => $force);
-
-
 if (! $ok) {
     usage ();
     exit;
@@ -72,7 +72,7 @@ exit;
 
 sub usage
 {
-print <<USAGEEOF;
+    print <<USAGEEOF;
 --verbose
 --force
 USAGEEOF

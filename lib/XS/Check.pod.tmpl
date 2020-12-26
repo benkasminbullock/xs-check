@@ -17,7 +17,7 @@ This method was added in version [% version %] of the module.
 
 =head1 NAME
 
-XS::Check - check XS for problems
+XS::Check - Check XS for some common problems
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,8 @@ corresponding to L<git commit [% commit.commit %]|[% info.repo
 
 =head1 DESCRIPTION
 
-This module offers ways to check XS files for common flaws.
+This module offers ways to check XS files for some common flaws which
+we have tripped over.
 
 =head1 METHODS
 
@@ -51,8 +52,9 @@ key C<reporter> as follows:
 
     my $usercheck = XS::Check->new (reporter => sub { print "help!" });
 
-The function you supply is then called back when L</check> or L</check_file> find something to remark on. The function is called with a hash containing the
-fields
+The function you supply is then called back when L</check> or
+L</check_file> find something to remark on. The function is called
+with a hash containing the fields
 
 =over
 
@@ -89,9 +91,9 @@ See L</SUGGESTIONS> for what this reports.
 
     $check->check ($xs_file);
 
-Convenience method to read in $xs_file then run L</check> on it.
+Convenience method to read in C<$xs_file> then run L</check> on it.
 
-This assumes UTF-8 encoding of $xs_file.
+This assumes UTF-8 encoding of C<$xs_file>.
 
 =head2 set_file
 
@@ -112,26 +114,28 @@ the motivations behind them.
 =head2 Use STRLEN in SvPV
 
 Using an int type for the second argument to SvPV may cause errors on
-64-bit Perls.
+64-bit Perls due to taking the address of the variable and then
+sending it to functions.
 
 =head2 Use const char * for return value of SvPV
 
 SvPV returns the actual Perl buffer, not a copy, so it's better to use
-const char * to make sure one does not overwrite it.
+C<const char *> to make sure one does not overwrite it.
 
 =head2 Don't use malloc/calloc/realloc/free
 
-Replace with Newx etc. 
-
-These cause "free to wrong pool" errors on multithreaded Windows
-Perls.
+The C standard library functions should usually be replaced with Newx,
+Newxz, and Safefree respectively in Perl XS code, because the C
+standard library functions may cause "free to wrong pool" errors on
+multithreaded Windows Perls.
 
 =head2 Don't use the Perl_ prefix
 
-Functions like C<Perl_croak> should not be used, just C<croak>. The
-C<Perl_> prefix functions may take arguments which are hidden in the
-macros like C<croak>. These are the C<pTHX_> style things of the Perl
-source code.
+Functions of the form C<Perl_croak> should usually not be used, just
+C<croak>. This is because the C<Perl_> prefix functions take different
+arguments, which are hidden in the macros like C<croak>. (The hidden
+arguments are the C<pTHX_> and similar things seen in the Perl source
+code.)
 
 This check was added in version 0.04.
 
@@ -145,9 +149,15 @@ This check was added in version 0.06.
 
 =head2 Dereferencing av_fetch or hv_fetch
 
-One should not dereference the return value of av_fetch or hv_fetch
-without checking for nulls since it is possible to return C<NULL>, for
-example if an array is created with only a tenth element.
+One should not dereference the return value of C<av_fetch> or
+C<hv_fetch> without checking for nulls since it is possible to return
+C<NULL>, for example if an array is created with only a tenth element.
+
+For an extended discussion, see L<http://blogs.perl.org/users/ben_bullock/2020/02/av-fetch-can-return-null.html>.
+
+Currently this check does not actually check that the returned value
+is checked for non-nullness before being dereferenced, only that there
+is nothing of the form C<* av_fetch> in your code.
 
 This check was added in version 0.09.
 
@@ -155,6 +165,18 @@ This check was added in version 0.09.
 
 The XS manual suggests putting whitespace before # comments to
 distinguish them from preprocessor statements.
+
+See L<https://perldoc.perl.org/perlxs#Inserting-POD,-Comments-and-C-Preprocessor-Directives>.
+
+=over
+
+Comments can be added to XSUBs by placing a # as the first
+non-whitespace of a line. Care should be taken to avoid making the
+comment look like a C preprocessor directive, lest it be interpreted
+as such. The simplest way to prevent this is to put whitespace in
+front of the #.
+
+=back
 
 This check was added in version 0.09.
 
