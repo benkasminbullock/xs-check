@@ -1,5 +1,9 @@
 Revision history for Perl module XS::Check
 
+0.10 2020-12-26
+
+- Check that one is added to av_len
+
 0.09 2020-12-25
 
 - Insist on whitespace before # comments
