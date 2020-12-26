@@ -1,36 +1,39 @@
 # Copied from /home/ben/projects/perl-build/lib/Perl/Build/Pod.pm
 package Perl::Build::Pod;
-use Perl::Build qw/get_info get_commit/;
 use parent Exporter;
 our @EXPORT_OK = qw/
-		       make_pod
 		       extract_vars
 		       get_dep_section
 		       make_examples
+		       make_pod
 		       pbtmpl
 		       pod_checker
 		       pod_encoding_ok
+		       pod_exports
 		       pod_link_checker
 		       pod_no_cut
 		       xtidy
-		       pod_exports
 		   /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
+
 use warnings;
 use strict;
 use utf8;
+
 use FindBin '$Bin';
 use Carp;
 use Pod::Checker;
-use File::Slurper qw/read_text read_lines/;
-use JSON::Create;
-use Deploy qw/do_system older/;
 use Pod::Select;
 use Test::Pod;
+use File::Slurper qw/read_text read_lines/;
+
+use JSON::Create;
+use Deploy qw/do_system older/;
+use Perl::Build qw/get_info get_commit/;
 
 =head1 NAME
 
-Pearl::Build::Pod - pod support for Pearl::Build
+Perl::Build::Pod - pod support for Perl::Build
 
 =head1 FUNCTIONS
 
@@ -47,7 +50,7 @@ sub pbtmpl
     my $self = __FILE__;
     my $dir = $self;
     $self =~ s!Pod.pm!templates!;
-    die unless -d $self && -f "$self/author";
+    die "Can't find template directory" unless -d $self && -f "$self/author";
     return $self;
 }
 
@@ -69,11 +72,10 @@ sub xtidy
 
     $text =~ s/^#!.*$//m;
 
-    # Remove sobvious.
+    # Remove obvious things.
 
     $text =~ s/use\s+(strict|warnings);\s+//g;
     $text =~ s/^\s*binmode\s+STDOUT.*?utf8.*\n//gm;
-#    $text =~ s/use\s+JSON::Parse.*?;\s+//;
 
     # Replace tabs with spaces.
 
@@ -246,16 +248,6 @@ sub unlikely_link
 	    return "URL without http:// etc?";
 	}
     }
-
-    # not sure what this was doing
-    # if ($link =~ m!^.+/!) {
-    # 	if ($link !~ m!^\w+::.*/.*$!) {
-    # 	    if ($link !~ /mikan/) {
-    # 		return "Unexpected slash";
-    # 	    }
-    # 	}
-    # }
-    # Allow it
     return undef;
 }
 
@@ -423,14 +415,21 @@ sub pod_exports
     return $ok;
 }
 
-use FindBin '$Bin';
+# Although this is a module, this function uses $Bin because it is
+# normally run by a script called "make-pod.pl" in the top directory
+# of the distribution.
 
 sub make_pod
 {
     my (%options) = @_;
     my $verbose = $options{verbose};
+    my $base = $options{base};
+    if (! $base) {
+	warn "Using \$Bin as base was not specified";
+	$base = $Bin;
+    }
     my %pbv = (
-	base => $Bin,
+	base => $base,
 	verbose => $verbose,
     );
     my $info = get_info (%pbv);
@@ -448,12 +447,13 @@ sub make_pod
 	commit => $commit,
     );
 
+    my $exdir = "$base/examples";
     my $tt = Template->new (
 	ABSOLUTE => 1,
 	INCLUDE_PATH => [
 	    $Bin,
 	    pbtmpl (),
-	    "$Bin/examples",
+	    $exdir,
 	],
 	ENCODING => 'UTF8',
 	FILTERS => {
@@ -465,11 +465,12 @@ sub make_pod
 	STRICT => 1,
     );
 
-    make_examples ("$Bin/examples", $options{verbose}, $options{force});
-
-    chmod 0644, $output;
+    make_examples ($exdir, $options{verbose}, $options{force});
+    if (-f $output) {
+	chmod 0644, $output;
+    }
     $tt->process ($input, \%vars, $output, binmode => 'utf8')
-    or die '' . $tt->error ();
+        or die '' . $tt->error ();
     chmod 0444, $output;
 }
 
