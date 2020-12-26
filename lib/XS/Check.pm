@@ -274,6 +274,17 @@ sub check_fetch_deref
     }
 }
 
+sub check_av_len
+{
+    my ($o) = @_;
+    while ($o->{xs} =~ m!^(.*av_len\s*\([^\)]*\)(.*))!g) {
+	my $later = $2;
+	if ($later !~ /\+\s*1/) {
+	    $o->report ("Add one to av_len");
+	}
+    }
+}
+
 #  _   _                       _     _ _     _      
 # | | | |___  ___ _ __  __   _(_)___(_) |__ | | ___ 
 # | | | / __|/ _ \ '__| \ \ / / / __| | '_ \| |/ _ \
@@ -321,6 +332,7 @@ sub check
     $o->check_c_pre ();
     $o->check_hash_comments ();
     $o->check_fetch_deref ();
+    $o->check_av_len ();
     # Final line
     $o->cleanup ();
 }
