@@ -11,7 +11,7 @@ produces output
 (This example is included as L<F<[% pl %]>|https://fastapi.metacpan.org/source/BKB/XS-Check-[% info.version %]/examples/[% pl %]> in the distribution.)
 [% END %]
 [% MACRO since(version) BLOCK -%]
-This method was added in version [% version %] of the module.
+This was added in version [% version %] of the module.
 [%- END %]
 =encoding UTF-8
 
@@ -79,7 +79,7 @@ C<message> and C<line> fields:
 
 [% example("reporter") %]
 
-Callback error reporting was added to the module in version 0.07.
+[% since('0.07') %].
 
 =head2 check
 
@@ -104,7 +104,7 @@ it. For example:
 
 [% example("set-file") %]
 
-This method was added in version 0.08.
+[% since('0.08') %]
 
 =head1 SUGGESTIONS
 
@@ -137,7 +137,7 @@ arguments, which are hidden in the macros like C<croak>. (The hidden
 arguments are the C<pTHX_> and similar things seen in the Perl source
 code.)
 
-This check was added in version 0.04.
+[% since('0.04') %]
 
 =head2 Don't use (void) in arguments
 
@@ -145,7 +145,7 @@ XS functions cannot use the ANSI C C<(void)> to indicate that they do
 not take any arguments, instead this results in a variable called
 "void" being created.
 
-This check was added in version 0.06.
+[% since('0.06') %]
 
 =head2 Dereferencing av_fetch or hv_fetch
 
@@ -159,7 +159,7 @@ Currently this check does not actually check that the returned value
 is checked for non-nullness before being dereferenced, only that there
 is nothing of the form C<* av_fetch> in your code.
 
-This check was added in version 0.09.
+[% since('0.09') %]
 
 =head2 Put whitespace before hash comments
 
@@ -178,7 +178,15 @@ front of the #.
 
 =back
 
-This check was added in version 0.09.
+[% since('0.09') %].
+
+=head2 Add one to av_len
+
+The C<av_len> function returns the length of an C<AV *> minus one, so
+if it is used as-is, one element of the array will be missed. The
+module does a simplistic check of adding one to C<av_len>.
+
+[% since('0.10') %]
 
 =head1 LIMITATIONS
 
@@ -214,12 +222,6 @@ The following variable C<length> is not dealt with correctly:
         const unsigned char * stuff;
         /* Copy the string in "text" into "text_fuzzy". */
         stuff = (unsigned char *) SvPV (text, length);
-
-=item Add one to av_len
-
-The C<av_len> function returns the length of an C<AV *> minus one, so
-if it is used as-is, one element of the array will be missed. The
-module does a simplistic check of adding one to C<av_len>.
 
 =back
 
