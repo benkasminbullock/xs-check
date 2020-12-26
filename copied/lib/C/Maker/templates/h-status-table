@@ -1,0 +1,6 @@
+typedef enum {
+[%- FOR status IN statuses %]
+    [% name_space %]_status_[% status.status %],
+[%- END %]
+}
+[% name_space %]_status_t;

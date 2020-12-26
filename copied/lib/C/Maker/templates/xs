@@ -1,0 +1,5 @@
+#include "EXTERN.h"
+#include "XSUB.h"
+
+MODULE=[% xs_name %] PACKAGE=[% xs_name %] PREFIX=[% xs_prefix %]
+

@@ -1,1 +1,16 @@
 language: perl
+before_install:
+  - cpanm C::Tokenize
+  - cpanm C::Utility
+  - cpanm File::Slurper
+  - cpanm IPC::Run3
+  - cpanm JSON::Create
+  - cpanm JSON::Parse
+  - cpanm Path::Tiny
+  - cpanm Pod::Select
+  - cpanm Table::Readable
+  - cpanm Template
+  - cpanm Test::Pod
+  - perl build.pl
+perl:
+  - "5.30"

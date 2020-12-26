@@ -1,9 +1,12 @@
 #!/home/ben/software/install/bin/perl
 use warnings;
 use strict;
-use Template;
 use FindBin '$Bin';
+
 use Getopt::Long;
+use Template;
+
+use lib "$Bin/copied/lib";
 
 use Perl::Build qw/get_info get_commit/;
 use Perl::Build::Pod ':all';
@@ -59,7 +62,7 @@ for my $example (@examples) {
     my $output = $example;
     $output =~ s/\.pl$/-out.txt/;
     if (older ($output, $example) || $force) {
-	do_system ("perl -I$Bin/blib/lib -I$Bin/blib/arch $example > $output 2>&1", $verbose);
+	do_system ("perl -I$Bin/lib $example > $output 2>&1", $verbose);
     }
 }
 

@@ -44,7 +44,11 @@ Returns the directory where templates may be found.
 
 sub pbtmpl
 {
-    return '/home/ben/projects/perl-build/lib/Perl/Build/templates';
+    my $self = __FILE__;
+    my $dir = $self;
+    $self =~ s!Pod.pm!templates!;
+    die unless -d $self && -f "$self/author";
+    return $self;
 }
 
 =head2 xtidy
@@ -275,10 +279,20 @@ sub make_examples
     my ($dir, $verbose, $force) = @_;
     my @examples = <$dir/*.pl>;
     for my $example (@examples) {
+	my @includes;
+	my $xsdir = "$dir/../blib/arch";
+	if (-d $xsdir) {
+	    push @includes, "$dir/../blib/lib";
+	    push @includes, $xsdir;
+	}
+	else {
+	    push @includes, "$dir/../lib";
+	}
+	@includes = map {s!$_!-I$_!; $_} @includes;
 	my $output = $example;
 	$output =~ s/\.pl$/-out.txt/;
 	if (older ($output, $example) || $force) {
-	    do_system ("perl -I$Bin/blib/lib -I$Bin/blib/arch $example > $output 2>&1", $verbose);
+	    do_system ("perl @includes $example > $output 2>&1", $verbose);
 	}
     }
 }
@@ -451,14 +465,7 @@ sub make_pod
 	STRICT => 1,
     );
 
-    my @examples = <$Bin/examples/*.pl>;
-    for my $example (@examples) {
-	my $output = $example;
-	$output =~ s/\.pl$/-out.txt/;
-	if (older ($output, $example) || $options{force}) {
-	    do_system ("perl -I$Bin/blib/lib -I$Bin/blib/arch $example > $output 2>&1", $verbose);
-	}
-    }
+    make_examples ("$Bin/examples", $options{verbose}, $options{force});
 
     chmod 0644, $output;
     $tt->process ($input, \%vars, $output, binmode => 'utf8')

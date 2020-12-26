@@ -120,7 +120,9 @@ sub build
     }
     if ($make_pod) {
 	eval {
-	    do_system ("$make_pod");
+	    # Use "perl" here since $make_pod probably contains local
+	    # Perl path.
+	    do_system ("perl $make_pod");
 	};
 	if ($@) {
 	    warn "Pod build failed: $@\n";

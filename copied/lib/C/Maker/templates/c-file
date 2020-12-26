@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <stdarg.h>
+#include <stdlib.h>
+
+#ifdef HEADER
+#ifndef ERROR_HANDLER
+#define ERROR_HANDLER [% name_space %]_error_handler
+#endif /* undef ERROR_HANDLER */
+
+[% INCLUDE "error-handler.h" %]
+
+#endif /* def HEADER */
+
+#ifndef ERROR_HANDLER_H
+#define ERROR_HANDLER_H
+
+typedef int (* error_handler_t) (const char * source_file,
+                                 int source_line_number,
+                                 const char * message, ...)
+    __attribute__ ((format (printf, 3, 4)));
+
+#endif /* ndef ERROR_HANDLER_H */
+
+
+/* This is the default error handler for this namespace. */
+
+static int
+[% name_space %]_default_error_handler (const char * source_file,
+                                        int source_line_number,
+                                        const char * message, ...)
+{
+    va_list args;
+
+    fprintf (stderr, "%s:%d: ", source_file, source_line_number);
+    va_start (args, message);
+    vfprintf (stderr, message, args);
+    fprintf (stderr, "\n");
+    return 0;
+}
+
+[% INCLUDE "namespace-error-handler" %]
+
+[% INCLUDE "error-handlers" %]
+[% INCLUDE "status-table" %]
+[% INCLUDE "define-message" %]
+#ifdef HEADER
+[% header %]
+#endif /* def HEADER */
+[% udefs %]
+#line 1 "[% original_file %]"
+[% c %]

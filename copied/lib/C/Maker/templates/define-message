@@ -1,0 +1,13 @@
+#ifdef VERBOSE
+#define MESSAGE(format, args...) {              \
+        printf ("%s:%d: ", __FILE__, __LINE__); \
+        printf (format, ## args);               \
+}
+#else /* VERBOSE */
+#define MESSAGE(format, args...)
+#endif /* VERBOSE */
+
+/* Local variables:
+mode: c
+End:
+*/

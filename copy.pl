@@ -18,10 +18,13 @@ if ($host ne 'mikan') {
     exit;
 }
 
-my $pbdir = "/home/ben/projects/perl-build";
-my $ddir = "/home/ben/projects/deploy";
+my $proj = '/home/ben/projects';
+my $pbdir = "$proj/perl-build";
+my $ddir = "$proj/deploy";
+my $pudir = "$proj/purge";
+my $cmdir = "$proj/c-maker";
 
-my @libs = ($pbdir, $ddir);
+my @libs = ($pbdir, $ddir, $pudir, $cmdir);
 my $copied = "$Bin/copied";
 my $lib = "$copied/lib";
 my $verbose;
