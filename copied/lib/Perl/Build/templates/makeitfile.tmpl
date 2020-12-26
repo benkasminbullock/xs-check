@@ -1,0 +1,13 @@
+all:
+
+objs: [% objs %]
+
+[% dependencies %]
+
+[% IF ! no_clean %]
+clean:
+	-rm -f [% clean %] makeitfile chuggles
+[% END %]
+# Local variables:
+# mode: makefile
+# End:
