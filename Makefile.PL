@@ -14,8 +14,8 @@ WriteMakefile (
     LICENSE => 'perl',
     PREREQ_PM => {
 	'Text::LineNumber' => '0.02',
-	'C::Tokenize' => '0.14',
-	'File::Slurper' => '0.009',
+	'C::Tokenize' => '0.18',
+	'File::Slurper' => '0.012',
     },
     META_MERGE => {
 	'meta-spec' => {
