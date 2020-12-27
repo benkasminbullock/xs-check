@@ -1,5 +1,11 @@
 Revision history for Perl module XS::Check
 
+0.11 2020-12-27
+
+- Documentation work
+- Skip more C preprocessor commands
+- Add options to the checkxs script
+
 0.10 2020-12-26
 
 - Check that one is added to av_len

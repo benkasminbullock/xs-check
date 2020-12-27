@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use Carp;
 use utf8;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use C::Tokenize '0.14', ':all';
 use Text::LineNumber;
 use File::Slurper 'read_text';
@@ -248,7 +248,19 @@ check_hash_comments
     my ($o) = @_;
     while ($o->{xs} =~ /^#\s*(\w*)/gsm) {
 	my $hash = $1;
-	if ($hash !~ /^(?:if|ifdef|else|endif|line|define|include|undef)(\s+|$)/) {
+	if ($hash !~ /^(?:
+			  define|
+			  else|
+			  endif|
+			  error|
+			  ifdef|
+			  ifndef|
+			  if|
+			  include|
+			  line|
+			  undef|
+			  warning|
+			  ZZZZZZZZZZZ)(\s+|$)/x) {
 	    $o->report ("Put whitespace before # in comments");
 	}
     }
@@ -303,6 +315,9 @@ sub new
 	else {
 	    $o->{reporter} = $r;
 	}
+    }
+    if (defined $options{verbose}) {
+	$o->{verbose} = $options{verbose};
     }
     return $o;
 }
