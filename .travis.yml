@@ -13,7 +13,8 @@ before_install:
   - cpanm Test::Pod
   - perl build.pl
 perl:
-  - "5.32"
+# Some versions don't seem to be available.
+#  - "5.32"
   - "5.30"
   - "5.28"
   - "5.26"
@@ -23,6 +24,6 @@ perl:
   - "5.18"
   - "5.16"
   - "5.14"
-  - "5.12"
-  - "5.10"
-  - "5.08"
+#  - "5.12"
+#  - "5.10"
+#  - "5.08"
