@@ -27,3 +27,5 @@ MYMETA..*
 ^xt/.*\.t$
 # These are for github only
 ^copied/.*$
+^\.travis\.yml$
+^copy\.pl$
