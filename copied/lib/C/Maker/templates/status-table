@@ -1,5 +1,0 @@
-const char * [% name_space %]_statuses[] = {
-[%- FOR status IN statuses %]
-    "[% status.description %]",
-[%- END %]
-};

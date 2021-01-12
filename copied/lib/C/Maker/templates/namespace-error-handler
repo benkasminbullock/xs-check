@@ -1,4 +1,0 @@
-/* This global variable is the error handler for this namespace. */
-
-error_handler_t [% name_space %]_error_handler =
-    [% name_space %]_default_error_handler;

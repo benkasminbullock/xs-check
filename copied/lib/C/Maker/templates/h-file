@@ -1,4 +1,0 @@
-extern const char * [% name_space %]_statuses[];
-[% INCLUDE "error-handler.h" %]
-[% INCLUDE "external-call" %]
-[% INCLUDE "h-status-table" %]
