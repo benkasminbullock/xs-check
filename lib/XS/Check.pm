@@ -53,15 +53,17 @@ sub report
 # Match a call to SvPV
 
 my $svpv_re = qr/
-		    ((?:$word_re(?:->|\.))*$word_re)
-		    \s*=[^;]*
-		    SvPV
-		    \s*\(\s*
-		    ($word_re)
-		    \s*,\s*
-		    ($word_re)
-		    \s*\)
-		/x;
+    (
+	(?:$word_re(?:->|\.))*$word_re
+    )
+    \s*=[^;]*
+    (SvPV(?:_bytes|_utf8)?)
+    \s*\(\s*
+    ($word_re)
+    \s*,\s*
+    ($word_re)
+    \s*\)
+/x;
 
 # Look for problems with calls to SvPV.
 
@@ -69,9 +71,7 @@ sub check_svpv
 {
     my ($o) = @_;
     while ($o->{xs} =~ /($svpv_re)/g) {
-	my $match = $1;
-	my $lvar = $2;
-	my $arg2 = $4;
+	my ($match, $lvar, $svpv, $arg1, $arg2) = ($1, $2, $3, $4, $5);
 	my $lvar_type = $o->get_type ($lvar);
 	my $arg2_type = $o->get_type ($arg2);
 	if ($o->{verbose}) {
@@ -82,6 +82,9 @@ sub check_svpv
 	}
 	if ($arg2_type && $arg2_type !~ /\bSTRLEN\b/) {
 	    $o->report ("$arg2 is not a STRLEN variable ($arg2_type)");
+	}
+	if ($svpv eq 'SvPV') {
+	    $o->report ("Specify either SvPV_bytes or SvPV_utf8");
 	}
     }
 }
