@@ -1,7 +1,6 @@
 use FindBin '$Bin';
 use lib $Bin;
 use XSCT;
-use Test::More;
 
 my $svpv = <<EOF;
 char * c;
@@ -11,9 +10,6 @@ c = SvPV(x, len);
 EOF
 
 got_warning ($svpv, "SvPV without bytes or utf8", 1);
-
-TODO: {
-local $TODO = 'Various SvPV formats';
 
 my $svpv_nolen = <<EOF;
 char * c;
@@ -41,5 +37,5 @@ c = SvPVx(x, len);
 EOF
 
 got_warning ($svpvx, "SvPVx without bytes or utf8", 1);
-}
+
 done_testing ();

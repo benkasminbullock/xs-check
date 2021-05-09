@@ -10,21 +10,21 @@ use XSCT;
 my $ok = <<EOF;
 const char * x;
 STRLEN len;
-x = SvPV_bytes (sv, len);
+x = SvPVbyte (sv, len);
 EOF
 got_warning ($ok, "OK XS", 0);
 
 my $len_wrong = <<EOF;
 const char * x;
 unsigned int len;
-x = SvPV_utf8 (sv, len);
+x = SvPVutf8 (sv, len);
 EOF
 got_warning ($len_wrong, "Not STRLEN", 1, qr!STRLEN!);
 
 my $not_const = <<EOF;
 char * x;
 STRLEN len;
-x = SvPV_bytes (sv, len);
+x = SvPVbyte (sv, len);
 EOF
 got_warning ($not_const, "Not const char *", 1);
 
@@ -66,14 +66,10 @@ EOF
 my $out = got_warning ($void_arg, "void argument", 1);
 like ($out, qr/4:/, "Got correct line number for error");
 
-# Got a bit tired here, finish the rest later. 2021-04-30 12:14:16
-
 my $warning;
 $SIG{__WARN__} = sub {
     $warning = shift;
 };
-
-
 
 $warning = undef;
 my $checker = XS::Check->new ();
@@ -123,11 +119,5 @@ sv_to_text_fuzzy (SV * text, STRLEN length)
 EOF
     ok (! $warning, "No warning with variable from function argument");
 }
-;
-
-
 
 done_testing ();
-# Local variables:
-# mode: perl
-# End:

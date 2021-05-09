@@ -57,7 +57,10 @@ my $svpv_re = qr/
 	(?:$word_re(?:->|\.))*$word_re
     )
     \s*=[^;]*
-    (SvPV(?:_bytes|_utf8)?)
+    (
+	SvPV(?:byte|utf8)?
+	(?:x|_(?:force|nolen))?
+    )
     \s*\(\s*
     ($word_re)
     \s*,\s*
@@ -83,7 +86,7 @@ sub check_svpv
 	if ($arg2_type && $arg2_type !~ /\bSTRLEN\b/) {
 	    $o->report ("$arg2 is not a STRLEN variable ($arg2_type)");
 	}
-	if ($svpv eq 'SvPV') {
+	if ($svpv !~ /bytes?|utf8/) {
 	    $o->report ("Specify either SvPV_bytes or SvPV_utf8");
 	}
     }
