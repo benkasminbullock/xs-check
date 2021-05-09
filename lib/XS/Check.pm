@@ -87,7 +87,7 @@ sub check_svpv
 	    $o->report ("$arg2 is not a STRLEN variable ($arg2_type)");
 	}
 	if ($svpv !~ /bytes?|utf8/) {
-	    $o->report ("Specify either SvPV_bytes or SvPV_utf8");
+	    $o->report ("Specify either SvPVbyte or SvPVutf8 to avoid ambiguity; see perldoc perlguts");
 	}
     }
 }
