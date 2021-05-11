@@ -197,6 +197,13 @@ check of seeing whether you have added one to C<av_len>.
 
 [% since('0.10') %]
 
+=head2 Use SvPVbyte or SvPVutf8 rather than SvPV
+
+To work around Perl's strings sometimes being in an ambiguous state,
+it is better to specify either SvPVbyte or SvPVutf8 and friends rather
+than plain SvPV. This check is also applied to the similar functions
+like SvPV_nolen.
+
 =head1 LIMITATIONS
 
 As of [% info.version %], the module has the following limitations.
