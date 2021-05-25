@@ -256,6 +256,7 @@ check_hash_comments
 	my $hash = $1;
 	if ($hash !~ /^(?:
 			  define|
+			  elif|
 			  else|
 			  endif|
 			  error|
