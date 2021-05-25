@@ -163,9 +163,9 @@ created with only a tenth element.
 
 For an extended discussion, see L<http://blogs.perl.org/users/ben_bullock/2020/02/av-fetch-can-return-null.html>.
 
-Currently this check does not actually check that the returned value
-is checked for non-nullness before being dereferenced, only that there
-is nothing of the form C<* av_fetch> in your code.
+This check does not actually check that the returned value is checked
+for non-nullness before being dereferenced, only that there is nothing
+of the form C<* av_fetch> in your code.
 
 [% since('0.09') %]
 
@@ -174,7 +174,7 @@ is nothing of the form C<* av_fetch> in your code.
 The XS manual suggests putting whitespace before # comments to
 distinguish them from preprocessor statements.
 
-See L<https://perldoc.perl.org/perlxs#Inserting-POD,-Comments-and-C-Preprocessor-Directives>.
+See L<https://perldoc.perl.org/perlxs#Inserting-POD,-Comments-and-C-Preprocessor-Directives>. 
 
 =over
 
@@ -204,6 +204,11 @@ it is better to specify either SvPVbyte or SvPVutf8 and friends rather
 than plain SvPV. This check is also applied to the similar functions
 like SvPV_nolen.
 
+The reasons for this are documented in C<perldoc perlapi> for Perl
+versions from C<5.34> onwards.
+
+[% since('0.12') %]
+
 =head1 LIMITATIONS
 
 As of [% info.version %], the module has the following limitations.
@@ -220,7 +225,7 @@ the following doesn't get dealt with properly:
 =item UTF-8 only
 
 L</check_file> uses L<File::Slurper/read_text> to read the text, which
-means it only takes UTF-8.
+means it only accepts text encoded as UTF-8.
 
 =item Variable declarations rely on a simplistic hack
 
